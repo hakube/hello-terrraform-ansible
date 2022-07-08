@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-nginx
+nginx__client_max_body_size: "1m"
+nginx__http_extra: []

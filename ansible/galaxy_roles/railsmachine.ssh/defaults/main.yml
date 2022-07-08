@@ -1,0 +1,49 @@
+---
+# defaults file for ansible-ssh
+ssh__port: 8822
+#ssh__listen_address: ''
+ssh__protocol: 2
+ssh__use_privilege_separation: 'yes'
+ssh__key_regeneration_interval: 3600
+ssh__server_key_bits: 1024
+ssh__syslog_facility: 'AUTH'
+ssh__log_level: 'INFO'
+ssh__login_grace_time: 30
+ssh__permit_root_login: 'no'
+ssh__strict_modes: 'yes'
+ssh__password_authentication: 'yes'
+ssh__x11_forwarding: 'yes'
+ssh__x11_display_offsets: 10
+ssh__print_motd: 'no'
+ssh__print_last_log: 'yes'
+ssh__tcp_keep_alive: 'yes'
+ssh__max_startups: '2:50:5'
+ssh__use_banner: false
+ssh__use_pam: 'yes'
+ssh__allow_tcp_forwarding: 'no'
+#ssh__allow_users: []
+#ssh__allow_groups: []
+ssh__extra_options: ''
+
+#ssh__client_alive:
+# interval:
+# count_max:
+
+#ssh__authorized_keys:
+#  - user: rails
+#    key: THE_KEY
+#    state: present
+
+#ssh__sftponly:
+#  chroot_directory:
+#  users:
+#    - username: sftponly
+#      password: CRYPTED_VALUE
+#      groups: []
+#      directory: '/upload'
+#    - username: <username>
+#      authorized_keys:
+#        - key: key
+#          state: <present|absent>
+#      groups: ["sftponly"]
+#      directory: '/upload'

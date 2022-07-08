@@ -1,0 +1,19 @@
+---
+# sftponly.yml
+# Sets up users and directories for chrooted, sftp-only access
+# By default, the chroot is /home/USERNAME and the user's home
+# will be inside that, at /home/USERNAME/home/USERNAME
+
+- name: ssh - create sftponly group
+  group:
+    name: sftponly
+    state: present
+  become: yes
+
+- name: ssh - add fake shell
+  lineinfile: path=/etc/shells line=/bin/false
+  become: yes
+
+- name: ssh - set up user directories for chroot
+  include_tasks: chroot_user.yml user="{{ item }}"
+  with_items: "{{ ssh__sftponly.users }}"

@@ -1,0 +1,4 @@
+---
+# defaults file for ansible-ruby
+ruby__major_version: '2.4'
+ruby__bundler_version: '1.15.0'

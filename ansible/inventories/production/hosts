@@ -1,0 +1,9 @@
+[all:vars]
+ansible_ssh_common_args=' -o ProxyCommand="ssh -W %h:%p 3.131.20.148 -p 8822"'
+ansible_port=8822
+ansible_user=ubuntu
+ansible_python_interpreter=/usr/bin/python3
+
+[app_servers]
+10.0.2.44
+10.0.1.69

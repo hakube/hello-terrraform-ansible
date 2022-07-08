@@ -1,0 +1,11 @@
+---
+- hosts: app_servers
+  roles:
+    - railsmachine.common
+    - railsmachine.ssh
+    - railsmachine.unattended-upgrades
+    - railsmachine.ruby
+    - railsmachine.nginx
+    - railsmachine.passenger-nginx
+    - onboarding-app
+    - all

@@ -1,0 +1,11 @@
+---
+common__packages: []
+common__firewall_rules: []
+#  - rule: allow
+#    port: 8822 # required
+#    protocol: tcp
+#    src: 127.0.0.1
+#    dest: 127.0.0.1
+
+common__timezone: "UTC"
+common__ssh_rule: limit

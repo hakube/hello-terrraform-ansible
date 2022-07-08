@@ -1,0 +1,8 @@
+*.tfstate
+*.tfstate
+.terraform/
+*.backup
+*.lock.*
+ansible/.vault_pass
+.virtualenv
+.envrc

@@ -1,0 +1,79 @@
+---
+- name: deploy location
+  file:
+    path: "{{ deploy_to }}"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    mode: '0755'
+  become: yes
+
+- name: nginx | Disable default nginx site
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+  become: yes
+
+- name: nginx | Write nginx vhost config
+  template:
+    src: "nginx-{{ ansible_distribution_release }}-vhost.conf.j2"
+    dest: /etc/nginx/sites-available/{{ app_name }}-vhost.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  notify: restart nginx
+
+- name: nginx | Create the vhost symbolic link
+  file:
+    src: /etc/nginx/sites-available/{{ app_name }}-vhost.conf
+    dest: /etc/nginx/sites-enabled/{{ app_name }}-vhost.conf
+    owner: root
+    group: root
+    state: link
+
+- name: nginx | Add nginx user to rails group
+  user:
+    name: "{{ nginx_user }}"
+    groups: rails
+    append: yes
+  become: yes
+
+# - name: nginx | Add rails env var
+#   lineinfile:
+#     path: /etc/environment
+#     line: export SECRET_KEY_BASE={{ railskeybase }}
+
+# - name: nginx | Add rails env var
+#   lineinfile:
+#     path: /etc/environment
+#     line: export RAILS_MASTER_KEY={{ railsmaster }}
+
+- name: rails | Add deploy dir
+  file:
+    path: "{{ deploy_to }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: rails | Database.yml
+  template:
+    src: "database.yml"
+    dest: "{{ deploy_to }}/shared/config/database.yml"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    mode: 0644
+  become: yes
+
+- name: rails | Add database env variables
+  lineinfile:
+    path: /etc/environment
+    line: "{{ item }}"
+  with_items:
+    "{{ database }}"
+
+- name: open port 90
+  ufw: rule=allow port=80
+

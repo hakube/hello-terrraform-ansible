@@ -1,0 +1,128 @@
+# railsmachine.ssh (Ansible) generated configuration file
+# See the sshd_config(5) manpage for details
+
+# What ports, IPs and protocols we listen for
+Port {{ ssh__port }}
+
+# Use these options to restrict which interfaces/protocols sshd will bind to
+#ListenAddress ::
+#ListenAddress 0.0.0.0
+{% if ssh__listen_address is defined %}
+ListenAddress {{ ssh__listen_address }}
+{% endif %}
+Protocol {{ ssh__protocol }}
+
+# HostKeys for protocol version 2
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_dsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+#Privilege Separation is turned on for security
+UsePrivilegeSeparation {{ ssh__use_privilege_separation }}
+
+# Lifetime and size of ephemeral version 1 server key
+KeyRegenerationInterval {{ ssh__key_regeneration_interval }}
+ServerKeyBits {{ ssh__server_key_bits }}
+
+# Logging
+SyslogFacility {{ ssh__syslog_facility }}
+LogLevel {{ ssh__log_level }}
+
+# Authentication:
+LoginGraceTime {{ ssh__login_grace_time }}
+PermitRootLogin {{ ssh__permit_root_login }}
+StrictModes {{ ssh__strict_modes }}
+
+RSAAuthentication yes
+PubkeyAuthentication yes
+#AuthorizedKeysFile	%h/.ssh/authorized_keys
+
+# Don't read the user's ~/.rhosts and ~/.shosts files
+IgnoreRhosts yes
+# For this to work you will also need host keys in /etc/ssh_known_hosts
+RhostsRSAAuthentication no
+# similar for protocol version 2
+HostbasedAuthentication no
+# Uncomment if you don't trust ~/.ssh/known_hosts for RhostsRSAAuthentication
+#IgnoreUserKnownHosts yes
+
+# To enable empty passwords, change to yes (NOT RECOMMENDED)
+PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+ChallengeResponseAuthentication no
+
+# Change to no to disable tunnelled clear text passwords
+PasswordAuthentication {{ ssh__password_authentication }}
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosGetAFSToken no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+
+X11Forwarding {{ ssh__x11_forwarding }}
+X11DisplayOffset {{ ssh__x11_display_offsets }}
+PrintMotd {{ ssh__print_motd }}
+PrintLastLog {{ ssh__print_last_log }}
+TCPKeepAlive {{ ssh__tcp_keep_alive }}
+AllowTcpForwarding {{  ssh__allow_tcp_forwarding  }}
+#UseLogin no
+
+# http://techgurulive.com/2009/09/15/how-to-protect-ssh-from-multiple-and-parallel-coordinated-attacks/
+MaxStartups {{ ssh__max_startups }}
+{% if ssh__use_banner %}
+Banner /etc/issue.net
+{% endif %}
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+{% if ssh__sftponly is defined %}
+Subsystem sftp internal-sftp
+{% else %}
+Subsystem sftp /usr/lib/openssh/sftp-server
+{% endif %}
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM {{ ssh__use_pam }}
+
+{% if ssh__allow_users is defined %}
+AllowUsers {{ ssh__allow_users|join(' ') }}
+{% endif %}
+
+{% if ssh__allow_groups is defined %}
+AllowGroups {{ ssh__allow_groups|join(' ') }}
+{% endif %}
+
+{{ ssh__extra_options }}
+
+# DebianBanner - Comes up in PCI reports all the time, so we should disable it by default:
+DebianBanner no
+
+{% if ssh__client_alive is defined %}
+# Timeouts
+ClientAliveInterval {{ ssh__client_alive.interval }}
+ClientAliveCountMax {{ ssh__client_alive.count_max }}
+{% endif %}
+
+{% if ssh__sftponly is defined %}
+Match Group sftponly
+  ChrootDirectory {{ (ssh__sftponly.chroot_directory + '%u') | default('%h') }}
+  ForceCommand internal-sftp
+  X11Forwarding no
+  AllowTcpForwarding no
+{% endif %}

@@ -1,0 +1,6 @@
+---
+# defaults file for ansible-passenger-nginx
+nginx__client_max_body_size: "1m"
+nginx__http_extra: []
+passenger__max_pool_size: 6
+# passenger__enterprise_download_token

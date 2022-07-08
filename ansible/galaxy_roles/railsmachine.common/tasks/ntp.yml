@@ -1,0 +1,10 @@
+---
+- name: common | Install ntp
+  apt:
+    pkg: ntp
+    state: present
+  become: yes
+
+- name: common | Ensure ntp is running and enabled at boot
+  service: name=ntp state=started enabled=yes
+  become: yes

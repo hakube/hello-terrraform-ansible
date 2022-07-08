@@ -1,0 +1,66 @@
+---
+# tasks file for ansible-passenger-nginx
+- name: passenger-nginx | Add Passenger apt key
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: "561F9B9CAC40B2F7"
+  become: yes
+
+- name: passenger-nginx | Add Passenger apt repository
+  apt_repository:
+    repo: "deb https://oss-binaries.phusionpassenger.com/apt/passenger {{ ansible_distribution_release }} main"
+    state: present
+  become: yes
+  when: passenger__enterprise_download_token is not defined
+
+- name: passenger-nginx | Add Passenger Enteprise apt repository
+  apt_repository:
+    repo: "deb https://download:{{ passenger__enterprise_download_token }}@www.phusionpassenger.com/enterprise_apt {{ ansible_distribution_release }} main"
+    state: present
+  become: yes
+  when: passenger__enterprise_download_token is defined
+
+- name: passenger-nginx | Install Nginx and Curl
+  apt:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+  become: yes
+  loop:
+    - nginx-extras
+    - curl
+
+- name:  passenger-nginx | Include OS release vars
+  include_vars: "{{ ansible_distribution_release }}.yml"
+
+- name: passenger-nginx | Install Passenger
+  apt:
+    pkg: "{{ passenger__package_name }}"
+    state: present
+    update_cache: yes
+  become: yes
+  when: passenger__enterprise_download_token is not defined
+
+- name: passenger-nginx | Install Passenger Enterprise
+  apt:
+    pkg: "{{ passenger__package_name }}-enterprise"
+    state: present
+    update_cache: yes
+  become: yes
+  when: passenger__enterprise_download_token is defined
+
+- name: passenger-nginx | Write nginx config file
+  template:
+    src: "etc/nginx/nginx-{{ ansible_distribution_release }}.conf.j2"
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  notify:
+    - restart nginx
+
+- name: passenger-nginx | Ensure nginx is running (and enable it at boot)
+  service: name=nginx state=started enabled=yes
+  ignore_errors: yes
+  become: yes

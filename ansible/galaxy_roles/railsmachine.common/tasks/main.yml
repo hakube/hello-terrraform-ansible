@@ -1,0 +1,10 @@
+---
+- include_tasks: ansible_deps.yml
+
+- name: common | Gathering Facts
+  setup:
+
+- include_tasks: common_deps.yml
+- include_tasks: firewall.yml
+- include_tasks: ntp.yml
+- include_tasks: timezone.yml

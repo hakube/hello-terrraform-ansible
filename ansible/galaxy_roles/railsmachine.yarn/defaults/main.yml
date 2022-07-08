@@ -1,0 +1,6 @@
+---
+yarn__gpg_key: '69475BAA'
+#yarn__cron_user: ""
+yarn__cron_minute: '10'
+yarn__cron_hour: '4'
+yarn__version: '1.21.1-1'

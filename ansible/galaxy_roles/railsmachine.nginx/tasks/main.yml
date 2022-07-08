@@ -1,0 +1,27 @@
+---
+# tasks file for ansible-nginx
+- name: nginx | Install nginx
+  apt:
+    name: nginx-extras
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: nginx | Copy nginx.conf configuration file
+  template:
+    src: "etc/nginx/nginx.conf.j2"
+    dest: "/etc/nginx/nginx.conf"
+    owner: root
+    group: root
+    mode: 644
+  become: yes
+  notify:
+    - nginx | restart nginx
+
+- name: nginx | Ensure nginx is started and enabled
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  become: yes

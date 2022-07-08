@@ -1,0 +1,85 @@
+---
+# chroot_user.yml
+
+- name: ssh - find chroot directories
+  set_fact:
+    sftponly_chroot: "{{ (ssh__sftponly.chroot_directory + user.username) | default('/home/' + user.username) }}"
+    sftponly_directory: "{{ user.directory | default('/home/' + user.username) }}"
+
+- name: ssh - define sftp homedir
+  set_fact:
+    sftponly_homedir: "{{ sftponly_chroot + sftponly_directory }}"
+
+- name: ssh - ensure sftp homedir exists
+  file:
+    path: "{{ sftponly_homedir }}"
+    state: directory
+  become: yes
+    
+- name: ssh - ensure user exists
+  user:
+    name: "{{ user.username }}"
+    home: "{{ sftponly_homedir }}"
+    shell: '/bin/false'
+    groups: "{{ ['sftponly'] + user.groups }}"
+    password: "{{ user.password | default(lookup('password', '/dev/null')) }}"
+  become: yes
+
+- name: ssh - find homedir's parent directories
+  shell: x="`dirname {{ sftponly_homedir }}`"; while [ "$x" != "/" ]; do echo "$x"; x=`dirname "$x"`; done
+  register: homedir_parents
+  changed_when: false
+  check_mode: no
+
+- name: ssh - chown and chmod homedir's parent directories
+  file:
+    path: "{{ parent_dir }}"
+    owner: root
+    mode: 0755
+  with_items: "{{ homedir_parents.stdout_lines }}"
+  loop_control: { loop_var: parent_dir }
+  become: yes
+
+- name: ssh - correct ownership of homedir
+  file:
+    path: "{{ sftponly_homedir }}"
+    group: sftponly
+    mode: 0755
+  become: yes
+
+- name: ssh - create sftp user ssh directory
+  file:
+    path: "{{ sftponly_homedir }}/.ssh"
+    state: directory
+    owner: "{{ user.username }}"
+    group: sftponly
+    mode: "0700"
+  become: yes
+
+- name: ssh - check for existance of ssh authorized_keys
+  stat:
+    path: "{{ sftponly_homedir }}/.ssh/authorized_keys"
+  register: authorized_keys_file
+  changed_when: false
+  become: yes
+
+- name: ssh - create sftp user ssh authorized_keys
+  file:
+    path: "{{ sftponly_homedir }}/.ssh/authorized_keys"
+    state: touch
+    owner: "{{ user.username }}"
+    group: sftponly
+    mode: "0600"
+  become: yes
+  when: not authorized_keys_file.stat.exists
+
+- name: ssh - install sftp user authorized keys
+  authorized_key:
+    user: "{{ user.username }}"
+    state: "{{ key_item.state | default('present') }}"
+    key: "{{ key_item.key }}"
+  loop: "{{ user.authorized_keys }}"
+  loop_control:
+    loop_var: key_item
+  when: user.authorized_keys is defined and authorized_keys_file.stat.exists
+  become: yes

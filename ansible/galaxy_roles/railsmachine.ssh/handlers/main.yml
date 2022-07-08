@@ -1,0 +1,5 @@
+---
+# handlers file for ansible-ssh
+- name: ssh - restart sshd
+  service: name=sshd state=restarted
+  become: yes

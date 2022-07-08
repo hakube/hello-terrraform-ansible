@@ -1,0 +1,6 @@
+- hosts: app_servers
+  tasks:
+    - name: Install libpq  (state=present is optional)
+      apt:
+        name: libpq-dev
+        state: present

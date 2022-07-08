@@ -1,0 +1,9 @@
+---
+- name: common | Install Python
+  raw: test -e /usr/bin/python || (sudo apt-get -y update && sudo apt-get install -y python-minimal)
+  register: common__pyout
+  become: yes
+  changed_when:
+  - False
+  - common__pyout.stdout != ""
+  - common__pyout.stdout != "\r\n"

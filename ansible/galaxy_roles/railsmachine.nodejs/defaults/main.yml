@@ -1,0 +1,5 @@
+---
+# defaults file for ansible-nodejs
+# version can be '14.x', '12.x', '10.x', '8.x', '7.x', or '6.x'
+nodejs__version: '6.x'
+nodejs__install_state: present

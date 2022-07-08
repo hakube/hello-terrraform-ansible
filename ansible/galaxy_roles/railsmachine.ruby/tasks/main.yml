@@ -1,0 +1,41 @@
+---
+# tasks file for ansible-ruby
+- name: ruby | Add Brightbox Ruby PPA
+  apt_repository:
+    repo: 'ppa:brightbox/ruby-ng'
+  become: yes
+
+- name: ruby | Install Ruby
+  apt:
+    name: "ruby{{ ruby__major_version }}"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: ruby | Install Ruby development headers
+  apt:
+    name: "ruby{{ ruby__major_version }}-dev"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: ruby | Update ruby alternatives
+  alternatives:
+    name: ruby
+    path: "/usr/bin/ruby{{ ruby__major_version }}"
+  become: yes
+
+- name: ruby | Update gem alternatives
+  alternatives:
+    name: gem
+    path: "/usr/bin/gem{{ ruby__major_version }}"
+  become: yes
+
+- name: ruby | Install Bundler
+  gem:
+    name: bundler
+    version: "{{ ruby__bundler_version }}"
+    state: present
+    include_dependencies: True
+    user_install: False
+  become: yes

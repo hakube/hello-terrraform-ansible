@@ -1,0 +1,53 @@
+---
+- name: common | Install ufw
+  apt:
+    name: ufw
+    state: present
+  become: yes
+
+- name: common | Allow Additional Firewall Rules
+  ufw:
+    state: enabled
+    rule:  "{{ item.rule | default('allow') }}"
+    port:  "{{ item.port }}"
+    proto: "{{ item.protocol | default('tcp') }}"
+    src:   "{{ item.src | default('any') }}"
+    dest:  "{{ item.dest | default('any') }}"
+  loop: "{{ common__firewall_rules }}"
+  become: yes
+
+# (Note that as ufw manages its own state, simply removing
+# a rule=allow task can leave those ports exposed. Either use delete=yes
+# or a separate state=reset task)
+- name: common | Open SSH port for TCP & block for 60s after 6 failed attempts
+  ufw:
+    state: enabled
+    rule: "{{ common__ssh_rule }}"
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - '8822'
+    - '22'
+  become: yes
+
+- name: common | Deny all Incoming Connections
+  ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+  become: yes
+
+- name: common | Allow All Outgoing Connections
+  ufw:
+    state: enabled
+    policy: allow
+    direction: outgoing
+  become: yes
+
+- name: common | Allow all Connections From Localhost
+  ufw:
+    state: enabled
+    from: "127.0.0.1"
+    rule: allow
+    proto: any
+  become: yes

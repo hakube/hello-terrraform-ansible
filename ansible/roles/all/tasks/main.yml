@@ -1,0 +1,41 @@
+---
+- name: add group
+  ansible.builtin.group:
+    name: "{{ deploy_group }}"
+    state: present
+    
+
+- name: add deploy user
+  user:
+    name: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    groups: sudo
+    append: yes
+    create_home: yes
+    system: no
+    home: "/home/{{ deploy_user }}"
+    shell: /bin/bash
+    state: present
+  become: yes
+
+- name: add rails sudo perms
+  lineinfile:
+    path: /etc/sudoers.d/90-cloud-init-users
+    line: "rails ALL=(ALL) NOPASSWD:ALL"
+
+- name: deploy user ssh dir
+  file:
+    path: "/home/{{ deploy_user }}/.ssh/"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+    mode: "0700"
+  become: yes
+
+- name: add ssh key
+  authorized_key:
+    user: "{{ deploy_user }}"
+    state: present
+    key: "{{ item.key }}"
+  with_items: "{{ ssh_authorized_keys }}"
+  become: yes

@@ -1,0 +1,24 @@
+---
+# defaults file for ansible-unattended-upgrades
+unattended_upgrades__enabled: "1"
+unattended_upgrades__blacklist:
+  - mariadb-client
+  - mariadb-client-5.5
+  - mariadb-client-core-5.5
+  - mariadb-client-10.1
+  - mariadb-client-core-10.1
+  - mariadb-client-10.2
+  - mariadb-client-core-10.2
+  - mariadb-common
+  - mariadb-galera-server
+  - mariadb-galera-server-5.5
+  - mariadb-server
+  - mariadb-server-5.5
+  - mariadb-server-10.1
+  - mariadb-server-core-10.1
+  - mariadb-server-10.2
+  - mariadb-server-core-10.2
+  - mongodb-10gen
+  - mysql-server
+  - redis-server
+  - riak

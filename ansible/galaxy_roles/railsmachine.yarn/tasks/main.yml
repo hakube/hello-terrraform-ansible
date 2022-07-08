@@ -1,0 +1,33 @@
+---
+# tasks file for ansible-yarn
+- name: yarn | Add Yarn apt key
+  apt_key:
+    id: "{{ yarn__gpg_key }}"
+    url: "https://dl.yarnpkg.com/debian/pubkey.gpg"
+    state: present
+  become: yes
+
+- name: yarn | Add Yarn apt repository
+  apt_repository:
+    repo: deb https://dl.yarnpkg.com/debian/ stable main
+    state: present
+    filename: "yarn"
+  become: yes
+
+- name: yarn | Install yarn
+  apt:
+    name: "yarn={{ yarn__version }}"
+    state: present
+    update-cache: yes
+    force: yes
+  become: yes
+
+- name: yarn | add cron job to clean up /tmp
+  cron:
+    name: "Remove yarn files from /tmp that are over 1 day old."
+    minute: "{{ yarn__cron_minute }}"
+    hour: "{{ yarn__cron_hour }}"
+    user: "{{ yarn__cron_user }}"
+    job: 'find /tmp/ -name "yarn*" -type d -mtime +1 -exec rm -rf {} \; > /dev/null'
+  when: yarn__cron_user is defined
+  become: yes

@@ -1,0 +1,24 @@
+---
+- hosts: app_servers
+  roles:
+    - railsmachine.ruby # Install new Ruby
+  tasks:
+    - name: ruby-upgrade | Update ruby alternatives
+      alternatives:
+        name: ruby
+        path: "/usr/bin/ruby{{ ruby__major_version }}"
+      become: yes
+    - name: ruby-upgrade | Update gem alternatives
+      alternatives:
+        name: gem
+        path: "/usr/bin/gem{{ ruby__major_version }}"
+      become: yes
+    - name: ruby-upgrade | Uninstall old Ruby
+      apt:
+        name: "{{ item }}"
+        state: absent
+      become: yes
+      with_items:
+        - ruby2.7.2-dev
+        - libruby2.7.2
+        - ruby2.7.2

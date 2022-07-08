@@ -1,0 +1,8 @@
+---
+- hosts: all
+  roles:
+    - railsmachine.common
+    - railsmachine.ssh
+    - railsmachine.unattended-upgrades
+    - all
+- import_playbook: app_servers.yml

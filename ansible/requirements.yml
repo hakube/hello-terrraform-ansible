@@ -1,0 +1,24 @@
+---
+- src: git+ssh://git@github.com/railsmachine/ansible-ruby.git
+  name: railsmachine.ruby
+
+- src: git+ssh://git@github.com/railsmachine/ansible-ssh.git
+  name: railsmachine.ssh
+
+- src: git+ssh://git@github.com/railsmachine/ansible-common.git
+  name: railsmachine.common
+
+- src: git+ssh://git@github.com/railsmachine/ansible-unattended-upgrades.git
+  name: railsmachine.unattended-upgrades
+
+- src: git+ssh://git@github.com/railsmachine/ansible-nginx.git
+  name: railsmachine.nginx
+
+- src: git+ssh://git@github.com/railsmachine/ansible-yarn.git
+  name: railsmachine.yarn
+
+- src: git+ssh://git@github.com/railsmachine/ansible-nodejs.git
+  name: railsmachine.nodejs
+
+- src: git+ssh://git@github.com/railsmachine/ansible-passenger-nginx.git
+  name: railsmachine.passenger-nginx

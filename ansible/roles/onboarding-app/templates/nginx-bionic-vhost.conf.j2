@@ -1,0 +1,11 @@
+server {
+	listen 80;
+	server_name _;
+
+  passenger_enabled on;
+  passenger_ruby /usr/bin/ruby;
+
+
+  root {{ deploy_to }}/current/public;
+
+}
